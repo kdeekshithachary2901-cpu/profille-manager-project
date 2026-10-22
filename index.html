@@ -39,17 +39,12 @@
     <h3>Live Database Output:</h3>
     <div id="output">No action taken yet.</div>
 
-    <!-- FIXED: Added explicit path to fetch the correct Supabase global toolkit -->
-    <script src="https://unpkg.com"></script>
+    <script src="https://cloudflare.com"></script>
     <script>
-        // FIXED: The project URL is taken directly from your dashboard screen
         const SUPABASE_URL = "https://supabase.co";
-        
-        // PASTE YOUR ANON KEY HERE: Replace the text inside the quotes below with your publishable key
         const SUPABASE_KEY = "sb_publishable_vrrhssTESxjPVkAMyVIhag_JQBd6FIk";
         
-        // FIXED: Initialized utilizing the correct global 'supabase' client bundle structure
-        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         const logBox = document.getElementById('output');
 
         async function saveProfile() {
@@ -79,7 +74,6 @@
             else if (data.length === 0) { logBox.innerText = "No profile found matching ID."; }
             else { 
                 logBox.innerText = "Profile Found:\n" + JSON.stringify(data, null, 2); 
-                // FIXED: Extracted fields safely out of the array response object
                 document.getElementById('name').value = data[0].name || '';
                 document.getElementById('bio').value = data[0].bio || '';
                 document.getElementById('skills').value = data[0].skills || '';
