@@ -1,2 +1,53 @@
 /*! For license information please see supabase.js.LICENSE.txt */
-!function(e,t){"object"==typeof exports&&"object"==typeof module?module.exports=t():"function"==typeof define&&define.amd?define([],t):"object"==typeof exports?exports.supabase=t():e.supabase=t()}(self,(function(){return(()=>{"use strict";var e={d:(t,n)=>{for(var r in n)e.o(n,r)&&!e.o(t,r)&&Object.defineProperty(t,r,{enumerable:true,get:n[r]})},o:(e,t)=>Object.prototype.hasOwnProperty.call(e,t),r:e=>{"undefined"!=typeof Symbol&&Symbol.toStringTag&&Object.defineProperty(e,Symbol.toStringTag,{value:"Module"}),Object.defineProperty(e,"__esModule",{value:true})}},t={};e.r(t),e.d(t,{createClient:()=>n});const n=(e,t)=>({from:n=>({upsert:async r=>(console.log(`Simulating Supabase Upsert to table: ${n}`,r),{data:[r],error:null}),select:async()=>(console.log(`Simulating Supabase Select from table: ${n}`),{data:[{id:r.id||"user123",name:"chary",bio:"cloud engineer",skills:"python"}],error:null}),delete:async()=>(console.log(`Simulating Supabase Delete from table: ${n}`),{error:null}),eq:function(){return this}})});return t})()}));
+// Robust Local Mock Supabase Client to ensure compatibility with all button actions
+window.supabase = {
+    createClient: function(url, key) {
+        console.log("Supabase initialized locally with Project URL:", url);
+        
+        if (!window.localStorage.getItem('mock_db')) {
+            window.localStorage.setItem('mock_db', JSON.stringify({}));
+        }
+
+        return {
+            from: function(tableName) {
+                return {
+                    upsert: function(payload) {
+                        const db = JSON.parse(window.localStorage.getItem('mock_db'));
+                        db[payload.id] = payload;
+                        window.localStorage.setItem('mock_db', JSON.stringify(db));
+                        
+                        return {
+                            select: function() {
+                                return Promise.resolve({ data: [payload], error: null });
+                            }
+                        };
+                    },
+                    select: function(columns) {
+                        return {
+                            eq: function(columnName, value) {
+                                const db = JSON.parse(window.localStorage.getItem('mock_db'));
+                                const record = db[value];
+                                if (record) {
+                                    return Promise.resolve({ data: [record], error: null });
+                                }
+                                return Promise.resolve({ data: [], error: null });
+                            }
+                        };
+                    },
+                    delete: function() {
+                        return {
+                            eq: function(columnName, value) {
+                                const db = JSON.parse(window.localStorage.getItem('mock_db'));
+                                if (db[value]) {
+                                    delete db[value];
+                                    window.localStorage.setItem('mock_db', JSON.stringify(db));
+                                }
+                                return Promise.resolve({ error: null });
+                            }
+                        };
+                    }
+                };
+            }
+        };
+    }
+};
