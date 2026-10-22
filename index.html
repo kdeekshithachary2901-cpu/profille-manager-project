@@ -1,52 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Profile Manager (CRUD)</title>
-    <style>
-        body { font-family: Arial, sans-serif; max-width: 500px; margin: 40px auto; padding: 20px; box-shadow: 0 0 10px rgba(0,0,0,0.1); border-radius: 8px; }
-        input, textarea { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
-        button { padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; color: white; font-weight: bold; margin-right: 5px; }
-        .btn-show { background-color: #007bff; }
-        .btn-improve { background-color: #28a745; }
-        .btn-remove { background-color: #dc3545; }
-        #output { margin-top: 20px; padding: 15px; border-radius: 4px; background: #f8f9fa; min-height: 50px; white-space: pre-wrap; color: #333; }
-    </style>
-</head>
-<body>
-
-    <h2>User Profile Management Panel</h2>
-    
-    <label>User ID:</label>
-    <input type="text" id="userId" placeholder="Enter unique ID (e.g., user123)">
-
-    <label>Full Name:</label>
-    <input type="text" id="name" placeholder="Alex Carter">
-
-    <label>Professional Bio:</label>
-    <textarea id="bio" placeholder="Cloud Engineer Intern..."></textarea>
-
-    <label>Technical Skills:</label>
-    <input type="text" id="skills" placeholder="Python, GitHub, Databases">
-
-    <div style="margin-top: 15px;">
-        <button class="btn-improve" onclick="saveProfile()">Create / Improve Profile</button>
-        <button class="btn-show" onclick="fetchProfile()">Show Profile</button>
-        <button class="btn-remove" onclick="removeProfile()">Remove Profile</button>
-    </div>
-
-    <h3>Live Database Output:</h3>
-    <div id="output">No action taken yet.</div>
-
-    <!-- 1. FIXED: Correct Supabase JavaScript CDN -->
-   <script src="supabase.js"></script>
+<!-- Local library fallback -->
+    <script src="supabase.js"></script>
     <script>
-        // 2. CRITICAL STEP: Update these placeholders with your actual project details from your Supabase Dashboard
+        // Replace these with your live project credentials from your dashboard settings if testing on live DB
         const SUPABASE_URL = "https://supabase.co"; 
         const SUPABASE_KEY = "sb_publishable_vrrhssTESxjPVkAMyVIhag_JQBd6FIk";
         
-        // 3. FIXED: Adjusted initialization syntax to target the verified global object
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         const logBox = document.getElementById('output');
 
@@ -65,40 +23,42 @@
             else { logBox.innerText = "Success! Profile saved:\n" + JSON.stringify(data, null, 2); }
         }
 
-       async function fetchProfile() {
-    const id = document.getElementById('userId').value;
-    if(!id) { alert('Please enter a User ID'); return; }
+        async function fetchProfile() {
+            const id = document.getElementById('userId').value;
+            if(!id) { alert('Please enter a User ID'); return; }
 
-    const { data, error } = await supabaseClient
-        .from('UserProfiles')
-        .select('*')
-        .eq('id', id);
-        
-    if (error) { logBox.innerText = "Error: " + error.message; } 
-    else if (!data || data.length === 0) { logBox.innerText = "No profile found matching ID."; }
-    else { 
-        logBox.innerText = "Profile Found:\n" + JSON.stringify(data, null, 2); 
-        // FIXED: Using index data instead of undefined 'r' references
-        document.getElementById('name').value = data[0].name || '';
-        document.getElementById('bio').value = data[0].bio || '';
-        document.getElementById('skills').value = data[0].skills || '';
-    }
-}
+            const { data, error } = await supabaseClient
+                .from('UserProfiles')
+                .select('*')
+                .eq('id', id);
+                
+            if (error) { logBox.innerText = "Error: " + error.message; } 
+            else if (!data || data.length === 0) { logBox.innerText = "No profile found matching ID."; }
+            else { 
+                logBox.innerText = "Profile Found:\n" + JSON.stringify(data, null, 2); 
+                document.getElementById('name').value = data[0].name || '';
+                document.getElementById('bio').value = data[0].bio || '';
+                document.getElementById('skills').value = data[0].skills || '';
+            }
+        }
 
-async function removeProfile() {
-    const id = document.getElementById('userId').value;
-    if(!id) { alert('Please enter a User ID'); return; }
+        async function removeProfile() {
+            const id = document.getElementById('userId').value;
+            if(!id) { alert('Please enter a User ID'); return; }
 
-    const { error } = await supabaseClient
-        .from('UserProfiles')
-        .delete()
-        .eq('id', id);
-        
-    if (error) { logBox.innerText = "Error: " + error.message; } 
-    else { 
-        logBox.innerText = `Profile ${id} removed successfully.`; 
-        document.getElementById('name').value = '';
-        document.getElementById('bio').value = '';
-        document.getElementById('skills').value = '';
-    }
-}
+            const { error } = await supabaseClient
+                .from('UserProfiles')
+                .delete()
+                .eq('id', id);
+                
+            if (error) { logBox.innerText = "Error: " + error.message; } 
+            else { 
+                logBox.innerText = `Profile ${id} removed successfully.`; 
+                document.getElementById('name').value = '';
+                document.getElementById('bio').value = '';
+                document.getElementById('skills').value = '';
+            }
+        }
+    </script>
+</body>
+</html>
