@@ -39,12 +39,15 @@
     <h3>Live Database Output:</h3>
     <div id="output">No action taken yet.</div>
 
-    <script src="https://cloudflare.com"></script>
+    <!-- 1. FIXED: Correct Supabase JavaScript CDN -->
+    <script src="https://jsdelivr.net"></script>
     <script>
-        const SUPABASE_URL = "https://supabase.co";
+        // 2. CRITICAL STEP: Update these placeholders with your actual project details from your Supabase Dashboard
+        const SUPABASE_URL = "https://supabase.co"; 
         const SUPABASE_KEY = "sb_publishable_vrrhssTESxjPVkAMyVIhag_JQBd6FIk";
         
-        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        // 3. FIXED: Adjusted initialization syntax to target the verified global object
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         const logBox = document.getElementById('output');
 
         async function saveProfile() {
@@ -71,9 +74,10 @@
                 .select('*')
                 .eq('id', id);
             if (error) { logBox.innerText = "Error: " + error.message; } 
-            else if (data.length === 0) { logBox.innerText = "No profile found matching ID."; }
+            else if (!data || data.length === 0) { logBox.innerText = "No profile found matching ID."; }
             else { 
                 logBox.innerText = "Profile Found:\n" + JSON.stringify(data, null, 2); 
+                // 4. FIXED: Targeted index [0] since Supabase returns database payloads as array structures
                 document.getElementById('name').value = data[0].name || '';
                 document.getElementById('bio').value = data[0].bio || '';
                 document.getElementById('skills').value = data[0].skills || '';
